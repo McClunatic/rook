@@ -178,29 +178,23 @@ data:
   #    readOnly: true
 
   # (Optional) CephCSI provisioner NodeAffinity (applied to both CephFS and RBD provisioner).
-  # CSI_PROVISIONER_NODE_AFFINITY: "role=storage-node; storage=rook, ceph"
+  CSI_PROVISIONER_NODE_AFFINITY: "node-role.kubernetes.io/storage=true"
   # (Optional) CephCSI provisioner tolerations list(applied to both CephFS and RBD provisioner).
   # Put here list of taints you want to tolerate in YAML format.
   # CSI provisioner would be best to start on the same nodes as other ceph daemons.
-  # CSI_PROVISIONER_TOLERATIONS: |
-  #   - effect: NoSchedule
-  #     key: node-role.kubernetes.io/control-plane
-  #     operator: Exists
-  #   - effect: NoExecute
-  #     key: node-role.kubernetes.io/etcd
-  #     operator: Exists
+  CSI_PROVISIONER_TOLERATIONS: |
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/storage
+      operator: Exists
   # (Optional) CephCSI plugin NodeAffinity (applied to both CephFS and RBD plugin).
-  # CSI_PLUGIN_NODE_AFFINITY: "role=storage-node; storage=rook, ceph"
+  CSI_PLUGIN_NODE_AFFINITY: "node-role.kubernetes.io/storage=true"
   # (Optional) CephCSI plugin tolerations list(applied to both CephFS and RBD plugin).
   # Put here list of taints you want to tolerate in YAML format.
   # CSI plugins need to be started on all the nodes where the clients need to mount the storage.
-  # CSI_PLUGIN_TOLERATIONS: |
-  #   - effect: NoSchedule
-  #     key: node-role.kubernetes.io/control-plane
-  #     operator: Exists
-  #   - effect: NoExecute
-  #     key: node-role.kubernetes.io/etcd
-  #     operator: Exists
+  CSI_PLUGIN_TOLERATIONS: |
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/storage
+      operator: Exists
 
   # (Optional) CephCSI RBD provisioner NodeAffinity (if specified, overrides CSI_PROVISIONER_NODE_AFFINITY).
   # CSI_RBD_PROVISIONER_NODE_AFFINITY: "role=rbd-node"
@@ -492,7 +486,7 @@ data:
 
   # Whether to start the discovery daemon to watch for raw storage devices on nodes in the cluster.
   # This daemon does not need to run if you are only going to create your OSDs based on StorageClassDeviceSets with PVCs.
-  ROOK_ENABLE_DISCOVERY_DAEMON: "false"
+  ROOK_ENABLE_DISCOVERY_DAEMON: "true"
   # The timeout value (in seconds) of Ceph commands. It should be >= 1. If this variable is not set or is an invalid value, it's default to 15.
   ROOK_CEPH_COMMANDS_TIMEOUT_SECONDS: "15"
   # Enable the csi addons sidecar.
@@ -590,11 +584,11 @@ spec:
             # - name: DISCOVER_TOLERATION_KEY
             #   value: "<KeyOfTheTaintToTolerate>"
             # (Optional) Rook Discover tolerations list. Put here list of taints you want to tolerate in YAML format.
-            # - name: DISCOVER_TOLERATIONS
-            #   value: |
-            #     - effect: NoSchedule
-            #       key: node-role.kubernetes.io/control-plane
-            #       operator: Exists
+            - name: DISCOVER_TOLERATIONS
+              value: |
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/storage
+                  operator: Exists
             #     - effect: NoExecute
             #       key: node-role.kubernetes.io/etcd
             #       operator: Exists
@@ -602,8 +596,8 @@ spec:
             # - name: DISCOVER_PRIORITY_CLASS_NAME
             #   value: "<PriorityClassName>"
             # (Optional) Discover Agent NodeAffinity.
-            # - name: DISCOVER_AGENT_NODE_AFFINITY
-            #   value: "role=storage-node; storage=rook, ceph"
+            - name: DISCOVER_AGENT_NODE_AFFINITY
+              value: "node-role.kubernetes.io/storage=true"
             # (Optional) Discover Agent Pod Labels.
             # - name: DISCOVER_AGENT_POD_LABELS
             #   value: "key1=value1,key2=value2"
